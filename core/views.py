@@ -406,7 +406,7 @@ class IndexView(generic.View):
                 customer.activation_key = activation_key
                 customer.save()
                 subject = 'Zeedah Account Verification'
-                body = f'Hi {username} \n Please click on the link below to confirm your registration \n http://zeedah.herokuapp.com/activate/{activation_key}'
+                body = f'Hi {username} \n Please click on the link below to confirm your registration \n http://zeeda.herokuapp.com/activate/{activation_key}'
                 sender = 'zeedah@gmail.com'
                 with mail.get_connection() as connection:
                     mail.EmailMessage(
@@ -422,6 +422,7 @@ class IndexView(generic.View):
         return render(self.request,self.template_name,context=context)
 
 def activate(request,activation_key):
+    print(activation_key)
     customer = get_object_or_404(Customer,activation_key=activation_key)
     if customer.user.is_active == True:
         return HttpResponseRedirect(reverse('login_page'))
