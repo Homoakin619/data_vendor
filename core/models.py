@@ -35,7 +35,7 @@ class Merchant(models.Model):
 
 	def get_item_price(self):
 		result = []
-		items = json.loads(self.data_price)
+		items = self.data_price #json.loads(self.data_price)
 		for item in items:
 			x = (item,items[item])
 			result.append(x)
