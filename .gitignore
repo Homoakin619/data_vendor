@@ -1,0 +1,4 @@
+.env
+txt-str.py
+*.pyc
+mysite.log

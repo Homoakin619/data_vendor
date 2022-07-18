@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+  <div class="col-md-8 ms-2 mt-2">
+      <div class="card shadow">
+          <h4 class="card-header center">Profile Information</h4>
+          <div class="card-body">
+              <img src="" alt="Profile Image">
+              <p>Username : {{ request.user.username }}</p>
+              <p>Phone : {{ customer.phone }}</p>
+              <p>Ref Id : {{ customer.ref_id }}</p>
+              <p>Pin: {{ customer.pin }} <a class="btn" data-bs-toggle="modal" data-bs-target="#pinModal" role="button" >SetPin</a> </p>
+              <a href="{% url 'edit-profile' %}" class="btn btn-success">Edit</a>
+          </div>
+      </div>
+  </div>
+</main>
+
+
+
+<div class="modal fade" id="pinModal" tabindex="-1" aria-labelledby="pinModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pinModalLabel">Payment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id='pin-form'>
+              {% csrf_token %}
+
+              <label for="email_id">Enter Email</label>
+              {{ form.email }}
+              {% for error in form.email.errors %}
+              <p style="color: red;">{{ error }}</p>
+              {% endfor %}
+
+              <label for="pin_id">Enter PIN</label>
+              {{ form.pin }}
+              
+              {% for error in form.pin.errors %}
+                <p style="color: red;">{{ error }}</p>
+              {% endfor %}
+
+              <button class="btn btn-success mt-2">Set Pin</button>
+
+          </form>
+          {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_script %}
+{% if error %}
+<script>
+ 
+  window.onload = () => {
+    $('#pinModal').modal('show');
+  }
+  
+</script>
+{% endif %}
+{% endblock extra_script %}

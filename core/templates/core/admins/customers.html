@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+<div class="col mt-3" >
+    <div class="card pt-2 ">
+        <div class="card-body shadow mb-4">
+            
+            <form method="post" class="overflow-scroll" style="height: 100vh;">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <!-- {{ form1.as_p }} -->
+                <input type="submit" class="btn btn-success mb-4" value="Save Changes">
+
+            </form>
+        </div>
+    </div> 
+</div>
+</main>
+
+
+{% endblock %}
+
+{% block extra_script %} 
+
+{% endblock extra_script %}

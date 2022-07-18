@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block script %} 
+<script>
+    setTimeout(function(){
+       window.location.href = "{% url 'dashboard' %}";
+    }, 5000);
+ </script>
+{% endblock script %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+    <div class="col">
+        <h4>You will be redirected to your dashboard in 5 Seconds</h4>
+        {% if message %} 
+            {{ message }}
+        {% endif %}
+    </div>
+    
+</main>
+{% endblock %}

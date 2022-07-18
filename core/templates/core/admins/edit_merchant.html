@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+    <div class="col-md-5 mt-3" >
+        <div class="card pt-2 shadow">
+            <div class="card-header">
+                <h4>Edit Merchant Data</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="submit" class="btn btn-success" value="Save Changes">
+                </form>
+            </div>
+        </div>  
+    </div>
+</main>
+
+{% endblock %}
+
+{% block extra_script %} 
+
+{% endblock extra_script %}

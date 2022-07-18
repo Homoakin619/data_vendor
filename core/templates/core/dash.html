@@ -1,0 +1,266 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+  
+  {% for item in items %}
+  <div class="col-md-3">
+    <div class="card me-4 shadow">
+      <img class="img-fluid  " src="{{ item.logo.url }}"  height="120"></img>
+      <div class="card-body">
+          <table class="mx-auto d-block">
+              <tbody>
+                  {% for network,price in item.get_item_price %}
+                  <tr>
+                      <td>
+                          <a quantity='{{ network }}' name='{{ item.title }}' class="btn btn-sm btn-danger me-3" data-bs-toggle="modal" 
+                          {% if balance < 350 %} data-bs-target="#paymentModal" {% else %} data-bs-target="#pinModal" {% endif %} data-bs-value="{{ price }}" role="button" >
+                              {{ network }}
+                          </a>
+                      </td>
+                      <td><a class="btn btn-sm btn-danger ms-3 disabled">{{ price }}</a></td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+          
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</main>
+
+<div class="row gx-3 gy-3 pt-2 ">
+  {% for item in items %}
+  
+  {% endfor %}
+</div>
+
+
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Fund Wallet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id="payment-form">
+              {% csrf_token %}
+              <div class="form-row">
+                <label for="card-element">
+                  Credit or debit card
+                </label>
+
+                <div id="card-element">
+                  <!-- A Stripe Element will be inserted here. -->
+                </div>
+                
+                <div class="mt-2">
+                  <input class="form-control border border-info" type="text" name="amount" id="amount" placeholder="Enter amount to Fund">
+                  <input type="text" name="form-name" value="card-form" hidden>
+                </div>
+                <!-- Used to display Element errors. -->
+                <div id="card-errors" role="alert"></div>
+              </div>
+              <div class="d-grid mt-2">  
+                <button class="btn btn-info " >Submit Payment</button>
+              </div>
+          </form>
+          <div class="modal-footer">
+            {% if messages %} 
+                {% for message in messages %} 
+                    <p> {{ message }} </p>
+                {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pin Modal -->
+  <div class="modal fade" id="pinModal" tabindex="-1" aria-labelledby="pinModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="pinModalLabel">Payment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" id='pin-form'>
+              {% csrf_token %}
+        
+              <!-- <input type="password" class="form-control" id="pin" name="pin" placeholder="Enter PIN" required> -->
+              {{ form.pin }}
+              {% for error in form.pin.errors %} 
+                  <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+              <div class="hideable_field mt-2">
+                <!-- <input class="form-control" type="text" name="beneficiary" placeholder="Enter Beneficiary" > -->
+                {{ form.beneficiary }}
+                {% for error in form.beneficiary.errors %} 
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="self_recharge" id="self_recharge">
+                <label class="form-check-label" for="self_recharge">
+                  Recharge For Self
+                </label>
+              </div>
+              
+              <!-- <input type="text" name="amounts" > -->
+              {{ form.amounts }}
+              <input type="text" name="form-name" value="pin-form" hidden>
+              <input type="text" name="merchant" hidden>
+              <input type="text" name="quantity" hidden>
+              <button class="btn btn-success mt-1">Make Payment</button>
+          </form>
+          {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+              <p style="text-decoration: none;" {% if message.tags %} class="text-{{ message.tags }}"{% endif %}>{{ message }}</p>
+              {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_script %} 
+<script src="https://js.stripe.com/v3/"></script>
+<!-- <script src="{% static 'js/myscript.js' %}"></script> -->
+
+<script>
+  // var stripe = Stripe('{{ stripe }}');
+  // var elements = stripe.elements();
+  var pay_form = $('#payment-form')
+  if (pay_form.is(":visible")) {
+    var stripe = Stripe('{{ stripe }}');
+    var elements = stripe.elements();
+  }
+  var hideable_field = $('.hideable_field');
+    
+
+  var self_recharge = document.querySelector("input[name='self_recharge']");
+
+  self_recharge.addEventListener('change',function() {
+    if (this.checked) {
+      hideable_field.hide();
+    } else {
+      hideable_field.show();
+    }
+  })
+   
+  
+
+  var pinModal = document.getElementById('pinModal')
+  pinModal.addEventListener('show.bs.modal', function (event) {
+  
+    // Button that triggered the modal
+    var button = event.relatedTarget
+
+    var price = button.getAttribute('data-bs-value');
+
+    var merchant = button.getAttribute('name');
+    var quantity = button.getAttribute('quantity');
+  
+    document.querySelector("input[name='amounts']").value = price;
+
+    document.querySelector("input[name='merchant']").value = merchant;
+
+    document.querySelector("input[name='quantity']").value = quantity;
+    
+  
+  
+})
+
+
+var style = {
+    base: {
+      // Add your base input styles here. For example:
+      fontSize: '16px',
+      color: '#32325d',
+    },
+  };
+  
+  var pay_form = $('#payment-form')
+  // if (pay_form.is(":visible")) {
+
+  var card = elements.create('card', {style: style});
+  
+    // Add an instance of the card Element into the `card-element` <div>.
+  card.mount('#card-element');
+
+  // Create a token or display an error when the form is submitted.
+  var form = document.getElementById('payment-form');
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    stripe.createToken(card).then(function(result) {
+      if (result.error) {
+        // Inform the customer that there was an error.
+        var errorElement = document.getElementById('card-errors');
+        errorElement.textContent = result.error.message;
+      } else {
+        // Send the token to your server.
+        stripeTokenHandler(result.token);
+      }
+    });
+  });
+
+
+  function stripeTokenHandler(token) {
+      // Insert the token ID into the form so it gets submitted to the server
+      var form = document.getElementById('payment-form');
+      var hiddenInput = document.createElement('input');
+      hiddenInput.setAttribute('type', 'hidden');
+      hiddenInput.setAttribute('name', 'stripeToken');
+      hiddenInput.setAttribute('value', token.id);
+      form.appendChild(hiddenInput);
+
+      // Submit the form
+      form.submit();
+    }
+
+
+    // }
+
+
+  var paymentModal = document.getElementById('paymentModal')
+  paymentModal.addEventListener('show.bs.modal', function (event) {
+    // Button that triggered the modal
+    var button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    var price = button.getAttribute('data-bs-value')
+    // If necessary, you could initiate an AJAX request here
+    // and then do the updating in a callback.
+    var balance = button.getAttribute('balance')
+    // Update the modal's content.
+    // var modalTitle = paymentModal.querySelector('.modal-title')
+    
+  })
+
+
+</script>
+
+{% if error %}
+<script>
+ 
+  // window.onload = () => {
+  //   $('#pinModal').modal('show');
+  // }
+  $(window).load(function(){
+    $('#pinModal').modal('show')
+  })
+  
+</script>
+{% endif %}
+
+{% endblock extra_script %}

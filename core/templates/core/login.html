@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <style>
+            .bd-placeholder-img {
+                font-size: 1.125rem;
+                text-anchor: middle;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                user-select: none;
+                }
+
+            @media (min-width: 768px) {
+                .bd-placeholder-img-lg {
+                    font-size: 3.5rem;
+                    }
+                }
+        </style>
+        <style>
+            html,
+            body {
+                height: 100%;
+                }
+
+            body {
+                display: flex;
+                align-items: center;
+                padding-top: 40px;
+                padding-bottom: 40px;
+                background-color: #f5f5f5;
+                }
+
+            .login-form {
+                width: 100%;
+                max-width: 330px;
+                padding: 15px;
+                margin: auto;
+                }
+
+            .login-form .checkbox {
+                font-weight: 400;
+                }
+
+            .login-form .form-floating:focus-within {
+                z-index: 2;
+                }
+
+            .login-form input[type="text"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+                }
+
+            .login-form input[type="password"] {
+                margin-bottom: 10px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                }
+
+            .signup-form {
+                width: 100%;
+                max-width: 330px;
+                padding: 15px;
+                margin: auto;
+                }
+
+            .signup-form .checkbox {
+                font-weight: 400;
+                }
+
+            .signup-form .form-floating:focus-within {
+                z-index: 2;
+                }
+
+            .signup-form input[type="email"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+                }
+
+            .signup-form input[type="text"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+                }
+
+            .signup-form input[type="password"] {
+                margin-bottom: 10px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                }
+
+            .signup-form input[type="number"] {
+                margin-bottom: 10px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                }
+
+        </style>
+    </head>
+    
+    <body>
+        
+        <main class="login-form" {% if disp %} style="display: none;" {% else %}  {% endif %}>
+          {% if messages %}
+        <div class="col">  
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <div>
+              <p>{{ message }}</p>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+              
+              <h1 class="h3 mb-3 fw-normal">Sign In</h1>
+              
+              {% for error in login_form.non_field_errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <div class="form-floating">
+                {{ login_form.username }}
+                <label for="floatingInput">Username</label>
+              </div>
+              
+              {% for error in login_form.username.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <div class="form-floating">
+                {{ login_form.password }}
+                <label for="floatingPassword">Password</label>
+              </div>
+
+              {% for error in login_form.password.errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <input type="text" name="login" value="login" hidden>
+          
+              <button class="w-100 btn btn-lg btn-primary mt-2" type="submit">Sign in</button>
+              <p >Not a registered User? <a id="s1" role="button">Sign Up</a> </p>
+              <p class="text-muted center">&copy; 2022 AkinsWebTech
+                <span class="text-muted center">homohaykins619@gmail.com</span>
+              </p>
+
+            </form>
+          </main>
+          
+          <main class="signup-form" {% if disp %} style="display: block;"{% else %} style="display: none;" {% endif %} >
+            <form method="POST">
+                {% csrf_token %}
+              
+
+              <h1 class="h3 mb2 fw-normal">Sign Up</h1>
+              
+              <div class="form-floating">
+                {{ form.username }}
+                <label for="floatingInput">Username</label>
+              </div>
+
+              {% for error in form.username.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <div class="form-floating">
+                {{ form.password1 }}
+                <label for="floatingPassword">Password</label>
+              </div>
+
+              {% for error in form.password1.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <div class="form-floating">
+                {{ form.password2 }}
+                <label for="floatingPassword1">Confirm Password</label>
+              </div>
+              {% for error in form.password2.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+
+              <div class="form-floating">
+                {{ form.email }}
+                <label for="floatingInput">Email</label>
+              </div>
+              {% for error in form.email.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+
+              <div class="form-floating">
+                {{ form.phone }}
+                <label for="floatingPassword">Phone</label>
+              </div>
+              {% for error in form.phone.errors %}
+              <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+
+              <input type="text" name="signup" value="signup" hidden>
+
+              <button class="w-100 btn btn-lg btn-primary mt-2" type="submit">Sign Up</button>
+              <p >Already a User? <a id="s2" role="button">Sign In</a> </p>
+              <p class="text-muted center">&copy; 2022 AkinsWebTech
+              <span class="text-muted center">homohaykins619@gmail.com</span>
+            </p>
+     
+            </form>
+
+          </main>
+
+    </body>
+
+    <script>
+        $(document).ready(function(){
+            $("#s1").click(function(){
+                $(".login-form").hide();
+                $(".signup-form").show()
+            })
+            $("#s2").click(function(){
+                $('.signup-form').hide();
+                $(".login-form").show();
+            });
+        });
+        
+
+    </script>
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+</html>

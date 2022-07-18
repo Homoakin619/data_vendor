@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+    <div class="col-md-8">
+        <div class="card">
+            <h4 class="card-header center">Profile Information</h4>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button class="btn btn-success" type="submit" >Save Changes</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

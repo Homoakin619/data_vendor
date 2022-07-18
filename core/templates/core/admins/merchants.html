@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
+  <div class="col mt-3" >
+      <div class="row gx-3 gy-3 pt-2 ">
+          {% for merchant in merchants %}
+          <div class="col-lg-3 col-sm-3 col-md-4">
+            <div class="card shadow">
+              <a href="{% url 'edit_merchant' merchant.id %}">
+                <div class="card-body">
+                    <img class="img-fluid mx-auto center" src="{{ merchant.logo.url }}"  height="120"></img>        
+                </div>
+              </a>
+            </div>
+        </div>
+          {% endfor %}
+      </div>
+  </div>
+</main>
+
+
+{% endblock %}
+
+{% block extra_script %} 
+
+{% endblock extra_script %}

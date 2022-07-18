@@ -1,0 +1,70 @@
+{% load balance %}
+
+<div class="col-12 col-sm-3 col-xl-d px-sm-2 px-0 bg-dark d-flex sticky-top" id="wid">
+  <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
+      <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <span class="fs-5 fw-3">Zeedah</span>
+      </a>
+      <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
+        {% if request.user.is_staff %}  
+        <li class="nav-item ">
+              <a href="/" class="nav-link {% if home %} {% else %} text-white {% endif %} px-sm-0 px-2 ">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Home</span>
+              </a>
+          </li>
+          <li>
+              <a href="#" data-bs-toggle="collapse" class="nav-link {% if dashboard %} {% else %}text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Dashboard</span> </a>
+          </li>
+          <li>
+              <a href="{% url 'transaction' %}" class="nav-link {% if transaction %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Transactions</span></a>
+          </li>
+          <li>
+              <a href="{% url 'merchants' %}" class="nav-link {% if merchant %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Merchants</span></a>
+          </li>
+          <li>
+              <a href="{% url 'users' %}" class="nav-link {% if users %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Customers</span> </a>
+          </li>
+          {% else %} 
+          <li class="nav-item">
+              <a href="/" class="nav-link {% if home %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
+                <span class="ms-1 d-none d-sm-inline">Home</span>
+              </a>
+          </li>
+          <li>
+              <a href="{% url 'profile' %}" class="nav-link {% if profile %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#person"/></svg>
+                  <span class="ms-1 d-none d-sm-inline">Profile</span></a>
+          </li>
+          <li>
+              <a href="{% url 'transactions' %}" class="nav-link {% if transaction %} {% else %} text-white {% endif %} px-sm-0 px-2">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+                  <span class="ms-1 d-none d-sm-inline">Transactions</span></a>
+          </li>
+          {% endif %}
+      </ul>
+      <div class="py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
+          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://github.com/mdo.png" alt="img" width="28" height="28" class="rounded-circle">
+              <span class="d-none d-sm-inline mx-1">{{ request.user.username }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+              
+              <li><a class="dropdown-item" href="{% url 'logout' %}">Sign out</a></li>
+          </ul>
+      </div>
+  </div>
+</div>
+
+   
+
+  
