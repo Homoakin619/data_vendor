@@ -19,6 +19,7 @@ urlpatterns = [
 		path('admins/backend/customers/',views.AdminListUsers.as_view(),name='users'),
 		path('admins/backend/merchants/',views.AdminListMerchants.as_view(),name='merchants'),
 		path('admins/backend/edit_merchant/<int:id>/',views.AdminEditMerchant.as_view(),name='edit_merchant'),
+		path('admins/backend/customer/<int:pk>/',views.AdminUserDetailView.as_view(),name='user_detail'),
 		# path('admins/backend/edit_customer/<int:id>/',views.AdminEditCustomer.as_view(),name='edit_customer'),
 
 		re_path(r'^activate/(?P<activation_key>.+)$', views.activate,name='activate'),

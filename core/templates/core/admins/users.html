@@ -9,14 +9,16 @@
                     <th>#</th>
                     <th>Username</th>
                     <th>Email</th>
+                    <th>Staff</th>
                 </tr>
             </thead>
             <tbody>
                 {% for customer in customers %}
                 <tr>
                     <th scope="row">{{ count }}</th>
-                    <td>{{ customer.username }}</td>
+                    <td> <a style="text-decoration: none;" class="text-white" href="{% url 'user_detail' customer.pk %}">{{ customer.username }}</a></td>
                     <td>{{ customer.email }}</td>
+                    <td>{% if customer.is_staff %} YES {% else %} NO {% endif %}</td>
                     
                 </tr>
                 {% endfor %}

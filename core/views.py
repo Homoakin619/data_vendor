@@ -11,11 +11,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.crypto import get_random_string
 
 
+
 from django.core import mail
 
 
 from .models import Customer,Merchant,CardTransactions, Transaction
-from .forms import CustomerForm,CustomerDetailsForm, LoginForm, MerchantForm, ChangePinForm, PinPurchaseForm
+from .forms import CustomerForm,CustomerDetailsForm, LoginForm, MerchantForm, ChangePinForm, PinPurchaseForm,UserDetailsForm,CustomerChangeForm
 
 import stripe
 import random
@@ -95,7 +96,6 @@ class ProfileView(LoginRequiredMixin,generic.View):
         else:
             context['error'] = True
             return render(self.request,self.template_name,context=context)
-        
 
 
 class DashboardView(LoginRequiredMixin,generic.View):
@@ -112,7 +112,6 @@ class DashboardView(LoginRequiredMixin,generic.View):
     # post-method to purchase data
     def post(self,*args,**kwargs):
         form = PinPurchaseForm(self.request.POST)
-        
         user = self.request.user
         customer = get_object_or_404(Customer,user=user)
         context = {'items':Merchant.objects.all(),'form':form,'error':False}
@@ -121,7 +120,7 @@ class DashboardView(LoginRequiredMixin,generic.View):
             if form.is_valid():
                 pin = form.cleaned_data['pin']
                 benef = form.cleaned_data['beneficiary']
-                amount = int(form.cleaned_data['amount'])
+                amount = int(form.cleaned_data['cost'])
                 merchant = self.request.POST.get('merchant')
                 item_qty = self.request.POST.get('quantity')
             
@@ -151,10 +150,13 @@ class DashboardView(LoginRequiredMixin,generic.View):
                         transaction.save()
                         return HttpResponseRedirect(reverse('success'))
                 else:
+                    print('pinfailed')
                     context['error'] = True
                     form.add_error('pin',ValidationError('Pin is incorrect'))
                     return render(self.request,self.template_name,context)
             else:
+                print('other failure')
+                print(form.errors)
                 context['error'] = True
                 return render(self.request,self.template_name,context)
         
@@ -302,6 +304,13 @@ class TransactionHistoryView(LoginRequiredMixin,generic.View):
 
 
 
+
+# ################################ ################################ ################################ ##########
+# ################################ ##########***********########### ################################ ##########
+# ################################ ****** ADMIN PAGE SECTION ****** ################################ ##########
+# ################################ ##########************########## ################################ ##########
+# ################################ ################################ ################################ ##########
+
 class AdminHomepage(LoginRequiredMixin,generic.View):
     template_name = 'core/admins/homepage.html'
     def get(self,*args,**kwargs):
@@ -323,6 +332,37 @@ class AdminListUsers(LoginRequiredMixin,generic.ListView):
         context = super().get_context_data(**kwargs)
         context['users'] = True
         return context
+
+class AdminUserDetailView(generic.View):
+    template_name = 'core/admins/user_details.html'
+    def get(self,*args,**kwargs):
+        pk =self.kwargs['pk']
+        user = get_object_or_404(User,pk=pk)
+        form = UserDetailsForm(instance=user)
+        customer = get_object_or_404(Customer,user=user)
+        customer_form = CustomerChangeForm(instance=customer)
+        context = {'user_form':form,'customer_form':customer_form,'cst':customer.ref_id}
+        return render(self.request,self.template_name,context=context)
+
+    def post(self,*args,**kwargs):
+        pk =self.kwargs['pk']
+        user = get_object_or_404(User,pk=pk)
+        form = UserDetailsForm(self.request.POST,instance=user)
+        customer = get_object_or_404(Customer,user=user)
+        customer_form = CustomerChangeForm(self.request.POST,self.request.FILES,instance=customer)
+        context = {'user_form':form,'customer_form':customer_form,'cst':customer.ref_id}
+        
+        if form.is_valid() and customer_form.is_valid():
+            customer_form.save()
+            form.save()
+            return HttpResponseRedirect(reverse('users'))
+        return render(self.request,self.template_name,context=context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['admin'] = 'Admin User'
+        return context
+
 
 class AdminListMerchants(LoginRequiredMixin,generic.ListView):
     model = Merchant
@@ -435,3 +475,6 @@ def activate(request,activation_key):
             customer.save()
             return HttpResponseRedirect(reverse('login_page'))
     return render(request,'core/activation.html')
+
+def verify_redirect(request):
+    return (request,'core/not_verified.html')

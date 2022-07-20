@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+<div class="col overflow-auto">
+{% block content %}
+<div class="col-md-8 offset-md-2">
+    <div class="card mt-2">
+        <h3 class="card-header">User Details {{ cst }}</h3>
+        <h4 class="card-title">{{ customer.ref_id }}</h4>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="id_image">Image</label>
+                    {{ customer_form.image }}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Username</span>
+                    {{ user_form.username }}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Email</span>
+                    {{ user_form.email }}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Firstname</span>
+                    {{ user_form.first_name }}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Lastname</span>
+                    {{ user_form.last_name }}
+                </div>
+                <!-- <div class="input-group mb-3">
+                    <span class="input-group-text">Ref Id</span>
+                    {{ customer_form.ref_id }}
+                </div> -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Phone</span>
+                    {{ customer_form.phone }}
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Balance</span>
+                    {{ customer_form.balance }}
+                    <span class="input-group-text">Pin</span>
+                    {{ customer_form.pin }}
+                </div>
+                {{ user_form.date_joined }}
+                <div class="form-check">
+                    {{ user_form.is_active }}
+                    <label class="form-check-label" for="id_is_active">
+                        Active
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ user_form.is_staff }}
+                    <label class="form-check-label" for="id_is_staff">
+                        Staff Status
+                    </label>
+                </div>
+                <div class="form-check">
+                    {{ customer_form.verified }}
+                    <label class="form-check-label" for="id_verified">
+                        Verification Status
+                    </label>
+                </div> 
+                <!-- {{customer_form}} -->
+              <!-- {{ user_form }} -->
+                
+                <button class="btn btn-primary w-100 mt-2 mb-2">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+</div>

@@ -1,17 +1,43 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,UserChangeForm
 from django.contrib.auth.models import User
 from  django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth import authenticate
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 import json
 
 
 from .models import Customer,Merchant
 
+class UserDetailsForm(forms.ModelForm):
+
+    username = forms.CharField(label='Username',widget=forms.TextInput(attrs={"class":"form-control border border-primary", "placeholder":"username", "autofocus":True }))
+    first_name = forms.CharField(required=False,label='Firstname',widget=forms.TextInput(attrs={"class":"form-control border border-primary", "placeholder":"Firstname", "autofocus":True }))
+    last_name =forms.CharField(required=False,label='Lastname',widget=forms.TextInput(attrs={"class":"form-control border border-primary","placeholder":"Lastname", "autofocus":True }))
+    email = forms.EmailField(label='Email',widget=forms.EmailInput(attrs={"class":"form-control border border-primary",  "placeholder":"name@example.com"}))
+    is_staff = forms.BooleanField(required=False,label='is_staff',widget=forms.CheckboxInput(attrs={'class':'form-check-input'}))
+    is_active = forms.BooleanField(required=False,label='is_active',widget=forms.CheckboxInput(attrs={'class':'form-check-input'}))
+    date_joined = forms.DateTimeField(label='Date Joined',widget=forms.DateTimeInput(attrs={"class":"form-control border border-primary", "id":"floatingInput", "placeholder":"username", "autofocus":True }))
+
+    class Meta:
+        model = User
+        fields = ('username','first_name','last_name','email','is_staff','is_active','date_joined')
+
+    
+
+class CustomerChangeForm(forms.ModelForm):
+    image = forms.ImageField(required=False,widget=forms.ClearableFileInput(attrs={'class':'form-control  border border-primary'}))
+    phone = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control border border-primary'}))
+    balance = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control border border-primary','disabled':True}))
+    pin = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={'class':'form-control border border-primary'}))
+    verified = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={'class':'form-check-input'}))
+    class Meta:
+        model = Customer
+        fields = ('image','phone','balance','pin','verified')
 
 
 class LoginForm(forms.Form):
@@ -25,12 +51,13 @@ class LoginForm(forms.Form):
         if len(username) < 3:
             raise ValidationError('Enter a valid username')
         query = User.objects.filter(username=username).exists()
-        if not query:
+        if query == False:
             raise ValidationError('Username does not exist')
         return username
     def clean(self):
-        username = self.cleaned_data['username']
-        password = self.cleaned_data['password']
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
         if not authenticate(username=username,password=password):
             raise ValidationError('Details do not match!')
         return self.cleaned_data
@@ -124,7 +151,8 @@ class ChangePinForm(forms.Form):
 class PinPurchaseForm(forms.Form):
     pin = forms.IntegerField(widget=forms.NumberInput(attrs={"type":"password", "class":"form-control border border-secondary","id":"pin","name":"pin","placeholder":"Enter PIN"}))
     beneficiary = forms.IntegerField(required=False,widget=forms.NumberInput(attrs={"class":"form-control","name":"beneficiary","placeholder":"Enter Beneficiary"}))
-    amount = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control border border-secondary','placeholder':'Enter Amount To Fund'}))
+    # amount = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control border border-secondary','placeholder':'Enter Amount To Fund','hidden':True}))
+    cost = forms.IntegerField(widget=forms.NumberInput(attrs={'hidden':True}))
 
     def clean_pin(self):
         pin = str(self.cleaned_data['pin'])

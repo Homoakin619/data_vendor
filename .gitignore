@@ -2,3 +2,4 @@
 txt-str.py
 *.pyc
 mysite.log
+*.md

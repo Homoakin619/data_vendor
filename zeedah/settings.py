@@ -37,8 +37,8 @@ LOGIN_REDIRECT_URL = 'dashboard'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',

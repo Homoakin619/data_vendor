@@ -91,7 +91,9 @@
         <div class="modal-body">
           <form method="post" id='pin-form'>
               {% csrf_token %}
-        
+              {% for error in form.amount.errors %} 
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
               <!-- <input type="password" class="form-control" id="pin" name="pin" placeholder="Enter PIN" required> -->
               {{ form.pin }}
               {% for error in form.pin.errors %} 
@@ -113,7 +115,7 @@
               </div>
               
               <!-- <input type="text" name="amounts" > -->
-              {{ form.amounts }}
+              {{ form.cost }}
               <input type="text" name="form-name" value="pin-form" hidden>
               <input type="text" name="merchant" hidden>
               <input type="text" name="quantity" hidden>
@@ -134,33 +136,22 @@
 {% endblock %}
 
 {% block extra_script %} 
-<script src="https://js.stripe.com/v3/"></script>
+
 <!-- <script src="{% static 'js/myscript.js' %}"></script> -->
-
 <script>
-  // var stripe = Stripe('{{ stripe }}');
-  // var elements = stripe.elements();
-  var pay_form = $('#payment-form')
-  if (pay_form.is(":visible")) {
-    var stripe = Stripe('{{ stripe }}');
-    var elements = stripe.elements();
-  }
-  var hideable_field = $('.hideable_field');
+var hideable_field = $('.hideable_field');
     
-
-  var self_recharge = document.querySelector("input[name='self_recharge']");
-
-  self_recharge.addEventListener('change',function() {
-    if (this.checked) {
-      hideable_field.hide();
-    } else {
-      hideable_field.show();
-    }
-  })
-   
+    var self_recharge = document.querySelector("input[name='self_recharge']");
   
-
-  var pinModal = document.getElementById('pinModal')
+    self_recharge.addEventListener('change',function() {
+      if (this.checked) {
+        hideable_field.hide();
+      } else {
+        hideable_field.show();
+      }
+    })
+  
+var pinModal = document.getElementById('pinModal')
   pinModal.addEventListener('show.bs.modal', function (event) {
   
     // Button that triggered the modal
@@ -170,18 +161,25 @@
 
     var merchant = button.getAttribute('name');
     var quantity = button.getAttribute('quantity');
-  
-    document.querySelector("input[name='amounts']").value = price;
+    console.log(price)
+    document.querySelector("input[name='cost']").value = price;
 
     document.querySelector("input[name='merchant']").value = merchant;
 
     document.querySelector("input[name='quantity']").value = quantity;
-    
-  
   
 })
-
-
+</script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  // var stripe = Stripe('{{ stripe }}');
+  // var elements = stripe.elements();
+  var pay_form = $('#payment-form')
+  if (pay_form.is(":visible")) {
+    var stripe = Stripe('{{ stripe }}');
+    var elements = stripe.elements();
+  
+   
 var style = {
     base: {
       // Add your base input styles here. For example:
@@ -189,9 +187,6 @@ var style = {
       color: '#32325d',
     },
   };
-  
-  var pay_form = $('#payment-form')
-  // if (pay_form.is(":visible")) {
 
   var card = elements.create('card', {style: style});
   
@@ -230,7 +225,7 @@ var style = {
     }
 
 
-    // }
+    }
 
 
   var paymentModal = document.getElementById('paymentModal')
