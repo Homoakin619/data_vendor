@@ -4,17 +4,14 @@ from django.shortcuts import redirect, render,get_object_or_404
 from django.views import generic
 from django.contrib.auth import login,authenticate,logout
 from django.http import HttpResponseRedirect,JsonResponse
-from django.urls import reverse
+from django.urls import reverse,reverse_lazy
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.crypto import get_random_string
-
-
-
 from django.core import mail
 
-
+from .mixins import CheckVerificationMixin
 from .models import Customer,Merchant,CardTransactions, Transaction
 from .forms import CustomerForm,CustomerDetailsForm, LoginForm, MerchantForm, ChangePinForm, PinPurchaseForm,UserDetailsForm,CustomerChangeForm
 
@@ -51,8 +48,9 @@ def get_price(network,value):
 
 
 
-class EditProfileView(LoginRequiredMixin,generic.View):
+class EditProfileView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
     template_name = 'core/edit-profile.html'
+    redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
         
         query = get_object_or_404(Customer,user=self.request.user)
@@ -68,8 +66,9 @@ class EditProfileView(LoginRequiredMixin,generic.View):
             return HttpResponseRedirect(reverse('profile'))
         return self.get(*args,**kwargs)
 
-class ProfileView(LoginRequiredMixin,generic.View):
+class ProfileView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
     template_name = 'core/profile.html'
+    redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
         form = ChangePinForm()
         context = {'form':form,'error':False,'profile':True}
@@ -98,12 +97,15 @@ class ProfileView(LoginRequiredMixin,generic.View):
             return render(self.request,self.template_name,context=context)
 
 
-class DashboardView(LoginRequiredMixin,generic.View):
+class DashboardView(CheckVerificationMixin,LoginRequiredMixin,generic.View):
     template_name = 'core/dash.html'
+    redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
+        print(self.request.user.is_staff)
         form = PinPurchaseForm()
         context ={'form':form,'error':False,'dashboard':True}
         customer = get_object_or_404(Customer,user=self.request.user)
+        print(customer.verified)
         context['balance'] = customer.balance
         context['stripe'] = settings.STRIPE_PK
         context['items']=Merchant.objects.all()
@@ -149,14 +151,11 @@ class DashboardView(LoginRequiredMixin,generic.View):
                             )
                         transaction.save()
                         return HttpResponseRedirect(reverse('success'))
-                else:
-                    print('pinfailed')
+                else: 
                     context['error'] = True
                     form.add_error('pin',ValidationError('Pin is incorrect'))
                     return render(self.request,self.template_name,context)
             else:
-                print('other failure')
-                print(form.errors)
                 context['error'] = True
                 return render(self.request,self.template_name,context)
         
@@ -212,8 +211,9 @@ class DashboardView(LoginRequiredMixin,generic.View):
 
 
 
-class FundWalletView(generic.View):
+class FundWalletView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
     template_name = 'core/payment.html'
+    redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
         form = PinPurchaseForm()
         context = {'stripe': settings.STRIPE_PK,'form':form}
@@ -285,18 +285,9 @@ class FundWalletView(generic.View):
             return render(self.request,self.template_name,context)
 
 
-
-def success(request):
-    return render(request,'core/success.html',{'message':'Transaction successful You will be credited soon!'})
-
-
-def logout_user(request):
-    logout(request)
-    return HttpResponseRedirect('/')
-
-
-class TransactionHistoryView(LoginRequiredMixin,generic.View):
+class TransactionHistoryView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
     template_name = 'core/transaction.html'
+    redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
         transactions = Transaction.objects.filter(user=self.request.user).order_by('-id')
         context = {'transactions':enumerate(transactions,start=1),'transaction':True}
@@ -446,7 +437,7 @@ class IndexView(generic.View):
                 customer.activation_key = activation_key
                 customer.save()
                 subject = 'Zeedah Account Verification'
-                body = f'Hi {username} \n Please click on the link below to confirm your registration \n http://zeeda.herokuapp.com/activate/{activation_key}'
+                body = f'Hi {username} \n Please click on the link below to confirm your registration \n http://{settings.DOMAIN}/activate/{activation_key}'
                 sender = 'zeedah@gmail.com'
                 with mail.get_connection() as connection:
                     mail.EmailMessage(
@@ -462,7 +453,6 @@ class IndexView(generic.View):
         return render(self.request,self.template_name,context=context)
 
 def activate(request,activation_key):
-    print(activation_key)
     customer = get_object_or_404(Customer,activation_key=activation_key)
     if customer.user.is_active == True:
         return HttpResponseRedirect(reverse('login_page'))
@@ -476,5 +466,29 @@ def activate(request,activation_key):
             return HttpResponseRedirect(reverse('login_page'))
     return render(request,'core/activation.html')
 
+def get_activation_url(request,*args,**kwargs):
+    user = request.user
+    customer = get_object_or_404(Customer,user=user)
+    activation_key = get_activation_key()
+    customer.activation_key = activation_key
+    subject = 'Zeedah Account Verification'
+    body = f'Hi {user.username} \n Please click on the link below to confirm your registration \n http://localhost:8000/activate/{activation_key}'
+    sender = 'zeedah@gmail.com'
+    with mail.get_connection() as connection:
+        mail.EmailMessage(
+            subject, body, sender, [user.email],
+            connection=connection,
+        ).send()
+    customer.save()
+    messages.success(request,'''Account activation requested successfully! 
+                                    \nKindly Check Your Email for link to activate your account''')
+    return render(request,'core/not_verified.html')
 def verify_redirect(request):
-    return (request,'core/not_verified.html')
+    return render(request,'core/not_verified.html')
+
+def success(request):
+    return render(request,'core/success.html',{'message':'Transaction successful You will be credited soon!'})
+
+def logout_user(request):
+    logout(request)
+    return HttpResponseRedirect('/')

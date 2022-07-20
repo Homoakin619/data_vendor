@@ -18,7 +18,12 @@
                     <th scope="row">{{ count }}</th>
                     <td> <a style="text-decoration: none;" class="text-white" href="{% url 'user_detail' customer.pk %}">{{ customer.username }}</a></td>
                     <td>{{ customer.email }}</td>
-                    <td>{% if customer.is_staff %} YES {% else %} NO {% endif %}</td>
+                    <td>{% if customer.is_staff %} 
+                        <svg class="bi me-2" width="16" height="16" style="color:green" ><use xlink:href="#check"/></svg> 
+                        {% else %} 
+                        <svg class="bi me-2" width="16" height="16" style="color:red" ><use xlink:href="#cancel"/></svg> 
+                        {% endif %}
+                    </td>
                     
                 </tr>
                 {% endfor %}

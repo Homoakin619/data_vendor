@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path,re_path
@@ -24,7 +25,9 @@ urlpatterns = [
 
 		re_path(r'^activate/(?P<activation_key>.+)$', views.activate,name='activate'),
 		path('success/',views.success,name='success'),
-		path('',views.IndexView.as_view(),name='login_page')
+		path('',views.IndexView.as_view(),name='login_page'),
+		path('not_verified/',views.verify_redirect,name='not_verified'),
+		path('get_verification/',views.get_activation_url,name="request_verification")
 		
 ]
 

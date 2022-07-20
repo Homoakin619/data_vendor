@@ -46,6 +46,9 @@ ALLOWED_HOSTS = [
     'localhost',
     
 ]
+DOMAIN = 'localhost:8000'
+if not DEBUG:
+    DOMAIN = 'zeeda.herokuapp.com'
 
 
 # Application definition

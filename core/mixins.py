@@ -20,10 +20,24 @@ class NotVerifiedMixin:
             raise ImproperlyConfigured(
                 '{0} is missing redirect_url attribute. Define {0}.redirect_url to overide get_redirect_url() method'.format(self.__class__.__name__)
             )
+        return str(redirect_url)
+
+    def test_func(self):
+        raise NotImplementedError(
+            '{0} method test_func() failed to be implemented s'.format(self.__class__.__name__)
+        )
+    
+    def get_test_func(self):
+        return self.test_func()
+
+    def dispatch(self,request,*args,**kwargs):
+        test_result = self.get_test_func()
+        if not test_result:
+            return redirect(self.get_redirect_url())
+        return super().dispatch(request,*args,**kwargs)
 
 class CheckVerificationMixin(NotVerifiedMixin):
     def test_func(self):
         user = self.request.user 
         customer = get_object_or_404(Customer,user=user)
-        if not customer.verified:
-            return True
+        return customer.verified
