@@ -293,24 +293,6 @@ class TransactionHistoryView(LoginRequiredMixin,CheckVerificationMixin,generic.V
         context = {'transactions':enumerate(transactions,start=1),'transaction':True}
         return render(self.request,self.template_name,context=context)
 
-class PasswordResetView(generic.View):
-    template_name = 'core/reset_password.html'
-    def get(self,request,*args,**kwargs):
-        form = PasswordResetForm()
-        customer = get_object_or_404(Customer,activation_key=self.kwargs['activation_key'])
-        user = customer.user
-        print(user.username)
-        context = {'form':form}
-        return render(request,self.template_name,context=context)
-    
-    def post(self,request,*args,**kwargs):
-        customer = get_object_or_404(Customer,activation_key=self.kwargs['activation_key'])
-        user = customer.user
-        print(user.username)
-        new_password = request.POST.get('password')
-        
-
-
 
 # ################################ ################################ ################################ ##########
 # ################################ ##########***********########### ################################ ##########
@@ -467,31 +449,7 @@ class IndexView(generic.View):
             else:
                 context = {'form':form,'disp':True,'errors':form.errors}
                 return render(self.request,self.template_name,context=context)
-        
-        elif reset:
-            email = self.request.POST.get('email')
-            try:
-                user = get_object_or_404(User,email=email)
-                customer = get_object_or_404(Customer,user=user)
-                subject = 'Zeedah Account Verification'
-                body = f"""You requested for a password reset on your account at zeedah.herokuapp.com kindly ignore this message if
-                            you didn't initiate this request else click on the link below to reset your password 
-                            \n http://localhost:8000/reset-password/{customer.activation_key}"""
 
-                sender = 'zeedah@gmail.com'
-                with mail.get_connection() as connection:
-                    mail.EmailMessage(
-                        subject, body, sender, [email],
-                        connection=connection,
-                    ).send()
-                print(mail)
-                return self.get(*args,**kwargs)
-            except Http404:
-                messages.info(self.request,'The email is not bound to any account on zeedah, kindly enter a valid email to recover your password')
-                return self.get(*args,**kwargs)
-            except:
-                messages.info(self.request,'There was a network error.')
-                return self.get(*args,**kwargs)
         return render(self.request,self.template_name,context=context)
 
 def activate(request,activation_key):
