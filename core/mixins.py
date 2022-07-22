@@ -24,7 +24,7 @@ class NotVerifiedMixin:
 
     def test_func(self):
         raise NotImplementedError(
-            '{0} method test_func() failed to be implemented s'.format(self.__class__.__name__)
+            '{0} method test_func() failed to be implemented'.format(self.__class__.__name__)
         )
     
     def get_test_func(self):

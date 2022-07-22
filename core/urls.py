@@ -1,8 +1,7 @@
-from unicodedata import name
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path,re_path
-
+from allauth.account import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -12,6 +11,7 @@ urlpatterns = [
 		path('profile/edit/',views.EditProfileView.as_view(),name='edit-profile'),
 		path('profile/transactions/',views.TransactionHistoryView.as_view(),name='transactions'),
 		path('wallet/fund/',views.FundWalletView.as_view(),name='fund'),
+		re_path(r'^reset-password/(?P<activation_key>.+)$',views.PasswordResetView.as_view(),name='reset_password'),
 
 
 		
@@ -27,7 +27,13 @@ urlpatterns = [
 		path('success/',views.success,name='success'),
 		path('',views.IndexView.as_view(),name='login_page'),
 		path('not_verified/',views.verify_redirect,name='not_verified'),
-		path('get_verification/',views.get_activation_url,name="request_verification")
+		path('get_verification/',views.get_activation_url,name="request_verification"),
+
+		# re_path(r'^password_reset/$', auth_views.password_reset, name='password_reset'),
+		# re_path(r'^password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
+		# re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+		# 	auth_views.password_reset_confirm, name='password_reset_confirm'),
+		# re_path(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
 		
 ]
 

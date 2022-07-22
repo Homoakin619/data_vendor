@@ -27,7 +27,23 @@ class UserDetailsForm(forms.ModelForm):
         model = User
         fields = ('username','first_name','last_name','email','is_staff','is_active','date_joined')
 
-    
+class PasswordResetForm(forms.Form):
+    password = forms.CharField(label='Password',widget=forms.PasswordInput(attrs={"class":"form-control border border-primary", "id":"floatingPassword", "placeholder":"Enter Password"}))
+    password_1 = forms.CharField(label='Password',widget=forms.PasswordInput(attrs={"class":"form-control border border-primary", "id":"floatingPassword", "placeholder":"Re-Enter Password"}))
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        if len(password) < 8:
+            raise ValidationError('Enter a password with 8 characters or more')
+        return password
+
+    def clean_password_1(self):
+        password1= self.cleaned_data['password']
+        password2 = self.cleaned_data['password_1']
+
+        if password1 and password2 and password1!= password2:
+            raise ValidationError('Passwords do not match!')
+        return password2
 
 class CustomerChangeForm(forms.ModelForm):
     image = forms.ImageField(required=False,widget=forms.ClearableFileInput(attrs={'class':'form-control  border border-primary'}))

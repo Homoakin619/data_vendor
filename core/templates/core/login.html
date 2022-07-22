@@ -149,11 +149,12 @@
               <input type="text" name="login" value="login" hidden>
           
               <button class="w-100 btn btn-lg btn-primary mt-2" type="submit">Sign in</button>
+              <!-- <span class="text-danger" role="button" data-bs-toggle="modal" data-bs-target="#forgot_password">Forgot Password</span> -->
+              <a href="{% url 'account_reset_password' %}">Forgot Password</a>
               <p >Not a registered User? <a id="s1" role="button">Sign Up</a> </p>
-              <p class="text-muted center">&copy; 2022 AkinsWebTech
+              <span class="text-muted center">&copy; 2022 AkinsWebTech
                 <span class="text-muted center">homohaykins619@gmail.com</span>
-              </p>
-
+              </span>
             </form>
           </main>
           
@@ -220,6 +221,29 @@
 
           </main>
 
+          <div class="modal fade" id="forgot_password" tabindex="-1" aria-labelledby="forgot_passwordModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="paymentModalLabel">Reset Password</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" >
+                      {% csrf_token %}
+                      <div class="mt-2">
+                        <input class="form-control border border-info" type="email" name="email" placeholder="Enter Your Email" autofocus>
+                        <input type="text" name="reset" value="reset" hidden>
+                      </div>
+                      <div class="d-grid mt-2">  
+                        <button class="btn btn-info " >Reset Password</button>
+                      </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+        </div>
+
     </body>
 
     <script>
@@ -234,7 +258,6 @@
             });
         });
         
-
     </script>
     <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
 </html>
