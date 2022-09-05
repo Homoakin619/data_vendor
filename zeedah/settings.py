@@ -35,7 +35,7 @@ STRIPE_PK = env('STRIPE_PK')
 LOGIN_URL = 'login_page'
 LOGIN_REDIRECT_URL = 'dashboard'
 
-
+DATA_API_KEY=env('DATA_API_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 DEBUG = False
@@ -234,8 +234,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / "mails"
 
 
-
-# Amazon s3 aws cloud bucket settings
 if not DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = env('EMAIL_HOST')
@@ -250,10 +248,3 @@ if not DEBUG:
         'API_SECRET': env('API_SECRET'),
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-#    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-#    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-#    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-#    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-#    S3_URL = 'http://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
-#    STATIC_URL = S3_URL

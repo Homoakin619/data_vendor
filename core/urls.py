@@ -11,7 +11,7 @@ urlpatterns = [
 		path('profile/edit/',views.EditProfileView.as_view(),name='edit-profile'),
 		path('profile/transactions/',views.TransactionHistoryView.as_view(),name='transactions'),
 		path('wallet/fund/',views.FundWalletView.as_view(),name='fund'),
-		re_path(r'^reset-password/(?P<activation_key>.+)$',views.PasswordResetView.as_view(),name='reset_password'),
+		# re_path(r'^reset-password/(?P<activation_key>.+)$',views.PasswordResetView.as_view(),name='reset_password'),
 
 
 		

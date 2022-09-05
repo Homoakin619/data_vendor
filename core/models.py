@@ -6,6 +6,20 @@ import random
 import string
 import json
 
+airtel = {'1GB':'airtel_1gb_30days','2GB':'airtel_2gb_30days','3GB':'airtel_3gb_30days'}
+mtn = {'1GB':'mtn_1gb_30days','2GB':'mtn_2gb_30days','3GB':'mtn_3gb_30days'}
+
+def get_product_name(name,qty):
+	
+	name = name.lower()
+	if name == 'airtel':
+		product_name = airtel[qty]
+	elif name == 'mtn':
+		product_name = mtn[qty]
+	else:
+		pass
+	return product_name
+
 def get_ref_id():
 	strings = string.ascii_lowercase + string.digits
 	result = ''

@@ -11,10 +11,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.crypto import get_random_string
 from django.core import mail
+import requests
 
 
 from .mixins import CheckVerificationMixin
-from .models import Customer,Merchant,CardTransactions, Transaction
+from .models import Customer,Merchant,CardTransactions, Transaction,get_product_name
 from .forms import CustomerForm,CustomerDetailsForm, LoginForm, MerchantForm, ChangePinForm, PasswordResetForm, PinPurchaseForm,UserDetailsForm,CustomerChangeForm
 
 import stripe
@@ -99,7 +100,7 @@ class ProfileView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
             return render(self.request,self.template_name,context=context)
 
 
-class DashboardView(CheckVerificationMixin,LoginRequiredMixin,generic.View):
+class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
     template_name = 'core/dash.html'
     redirect_url = reverse_lazy('not_verified')
     def get(self,*args,**kwargs):
@@ -125,10 +126,11 @@ class DashboardView(CheckVerificationMixin,LoginRequiredMixin,generic.View):
                 amount = int(form.cleaned_data['cost'])
                 merchant = self.request.POST.get('merchant')
                 item_qty = self.request.POST.get('quantity')
-            
+                product_name = get_product_name(merchant,item_qty)
+                api_key = settings.DATA_API_KEY
                 user_pin = customer.pin
                 recharge_self = self.request.POST.get('self_recharge',False)
- 
+                print("--",product_name)
                 if int(pin) == user_pin:
                     if recharge_self is not False:
                         beneficiary = customer.phone
@@ -140,17 +142,43 @@ class DashboardView(CheckVerificationMixin,LoginRequiredMixin,generic.View):
                         # messages.warning(self.request,'Kindly select a beneficiary to recharge, or tick checkbox to recharge for self!') 
                         return render(self.request,self.template_name,context)
                     else:
-                        balance = customer.balance - amount
-                        customer.balance = balance
-                        customer.save()
-                        transaction_id = get_ref_id()
-                        price = get_price(merchant,item_qty)
-                        transaction =Transaction.objects.create(
-                                transaction_id=transaction_id, user=user, merchant=merchant, beneficiary=beneficiary, item_qty=item_qty, 
-                                successful=True,price=price
-                            )
-                        transaction.save()
-                        return HttpResponseRedirect(reverse('success'))
+                        try:
+                        ##### api call
+                        # check network and data quantity to pass to api call
+                            url = f"https://megabyte.com.ng/api/v2/datashare/?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
+                            payload = ""
+                            headers = {}
+                            response = requests.request("POST",url, headers=headers, data=payload)
+                            code = int(response.json()['error_code'])
+                            print(type(code))
+                            if code == 1986:
+                                transaction_id = response.json()['data']['recharge_id']
+                                price = get_price(merchant,item_qty)
+                                transaction =Transaction.objects.create(
+                                        transaction_id=transaction_id, user=user, merchant=merchant, beneficiary=beneficiary, item_qty=item_qty, 
+                                        successful=True,price=price
+                                    )
+                                transaction.save()
+                                return HttpResponseRedirect(reverse('success'))
+                            elif code == 1983:
+                                #  Send admin message that he has insufficient balance on his wallet
+                                subject = 'Insufficient balance'
+                                body = 'Hi Admin \nBalance is low recharge'
+                                sender = 'zeedah@gmail.com'
+                                email = 'kolakins97@gmail.com'
+                                with mail.get_connection() as connection:
+                                    mail.EmailMessage(
+                                        subject, body, sender, [email],
+                                        connection=connection,
+                                    ).send()
+                                
+                                messages.success(self.request,"Oops! Transaction Failed! \n Please try again. \nNOTE: You were not charged for this transaction")
+                                return render(self.request,self.template_name,context)
+                            else:
+                                
+                                return HttpResponseRedirect(reverse('dashboard'))
+                        except:
+                            pass
                 else: 
                     context['error'] = True
                     form.add_error('pin',ValidationError('Pin is incorrect'))
@@ -390,7 +418,9 @@ class IndexView(generic.View):
             if self.request.user.is_staff:
                 return HttpResponseRedirect(reverse('admins'))
             else:
-                return HttpResponseRedirect('dashboard')
+                return HttpResponseRedirect(reverse('dashboard'))
+        # url = f"https://megabyte.com.ng/api/v2/datashare/?api_key={settings.DATA_API_KEY}&product_name=data_share_1gb&phone=08143118481"
+        # print(url)
         form = CustomerForm()
         login_form = LoginForm()
         context = {'form':form,'login_form':login_form,'disp':False}
@@ -418,6 +448,7 @@ class IndexView(generic.View):
                     else:
                         return HttpResponseRedirect(reverse('dashboard'))
                 else:
+                    print('user does not exist')
                     context['errors'] = login_form.errors
                     return render(self.request,self.template_name,context=context)
             else: 
@@ -458,9 +489,9 @@ def activate(request,activation_key):
         return HttpResponseRedirect(reverse('login_page'))
     else:    
         if request.method == 'POST':
-            user = customer.user
-            user.is_active = True
-            user.save()
+            # user = customer.user
+            # user.is_active = True
+            # user.save()
             customer.verified = True
             customer.save()
             return HttpResponseRedirect(reverse('login_page'))
@@ -483,8 +514,6 @@ def get_activation_url(request,*args,**kwargs):
     messages.success(request,'''Account activation requested successfully! 
                                     \nKindly Check Your Email for link to activate your account''')
     return render(request,'core/not_verified.html')
-
-
 
 
 def verify_redirect(request):

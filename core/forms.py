@@ -118,9 +118,9 @@ class CustomerForm(UserCreationForm):
     def save(self, commit=True):
         user = User.objects.create_user(self.cleaned_data['username'],self.cleaned_data['email'],self.cleaned_data['password1'])
         user.is_staff = False
-        user.is_active = False
-        group = Group.objects.get(name='customers')
-        user.groups.add(group)
+        # user.is_active = False
+        # group = Group.objects.get(name='customers')
+        # user.groups.add(group)
         customer = Customer.objects.create(user=user,phone=self.cleaned_data['phone'])
         customer.save()
         user.save()
