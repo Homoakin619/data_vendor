@@ -58,28 +58,18 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form method="post" id="payment-form">
-              {% csrf_token %}
-              <div class="form-row">
-                <label for="card-element">
-                  Credit or debit card
-                </label>
-
-                <div id="card-element">
-                  <!-- A Stripe Element will be inserted here. -->
-                </div>
-                
-                <div class="mt-2">
-                  <input class="form-control border border-info" type="text" name="amount" id="amount" placeholder="Enter amount to Fund">
-                  <input type="text" name="form-name" value="card-form" hidden>
-                </div>
-                <!-- Used to display Element errors. -->
-                <div id="card-errors" role="alert"></div>
-              </div>
-              <div class="d-grid mt-2">  
-                <button class="btn btn-info " >Submit Payment</button>
-              </div>
-          </form>
+          <blockquote>
+            <small>
+              If you opt for bank transfers, kindly pay into the account mentioned below. <br>
+              But you have to contact admin to verify payment by providing proof. <br>
+              Acct No: 7015233255
+              Palmpay <br>
+              Click <a href="https://wa.me/message/VZIGY7HEQO4QL1"> here to</a> reach admin
+            </small>
+          </blockquote>
+          <div class="d-grid mt-2">  
+            <a class="btn btn-info" href="{% url 'fund' %}" >Go To Payment</a>
+          </div>
           <div class="modal-footer">
             {% if messages %} 
                 {% for message in messages %} 

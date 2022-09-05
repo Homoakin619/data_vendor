@@ -144,7 +144,6 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                         return render(self.request,self.template_name,context)
                     else:
                         try:
-                            print(beneficiary)
                         ##### api call
                         # check network and data quantity to pass to api call
                             url = f"https://megabyte.com.ng/api/v2/datashare/?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
@@ -155,6 +154,9 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                             if code == 1986:
                                 transaction_id = response.json()['data']['recharge_id']
                                 price = get_price(merchant,item_qty)
+                                balance = customer.balance - price
+                                customer.balance = balance
+                                customer.save()
                                 transaction =Transaction.objects.create(
                                         transaction_id=transaction_id, user=user, merchant=merchant, beneficiary=beneficiary, item_qty=item_qty, 
                                         successful=True,price=price
