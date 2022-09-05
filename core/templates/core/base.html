@@ -129,7 +129,9 @@
             <div class="col d-flex flex-column h-sm-100">
               {% if request.user.is_authenticated %}
                 {% if not request.user.is_staff %}
+                
                 <ul class="list-inline ms-auto">
+                  <span class="me-0">Visit your profile to create transaction pin if you haven't</span>
                   <li class="list-inline-item px-sm-0 m-0">
                     <a class="nav-link">
                     <svg class="bi me-2" width="16" height="16"><use xlink:href="#currency"/></svg>

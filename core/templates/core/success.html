@@ -2,19 +2,47 @@
 
 {% block script %} 
 <script>
-    setTimeout(function(){
-       window.location.href = "{% url 'dashboard' %}";
-    }, 5000);
+    // setTimeout(function(){
+    //    window.location.href = "{% url 'dashboard' %}";
+    // }, 5000);
  </script>
 {% endblock script %}
 
 {% block content %}
 <main class="row overflow-auto me-2 gx-1 gy-1 pt-2">
-    <div class="col">
+    <!-- <div class="col">
         <h4>You will be redirected to your dashboard in 5 Seconds</h4>
         {% if message %} 
             {{ message }}
         {% endif %}
+    </div> -->
+    <div class="row">
+        <div class="col-md-5 offset-md-2">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>Transaction Id</td>
+                    <td>{{ transaction_id }}</td>
+                </tr>
+                <tr>
+                    <td>Purchased Item</td>
+                    <td>{{ item }}</td>
+                </tr>
+                <tr>
+                    <td>Quantity</td>
+                    <td>{{ item_qty }}</td>
+                </tr>
+                <tr>
+                    <td>Beneficiary</td>
+                    <td>0{{ beneficiary }}</td>
+                </tr>
+                <tr>
+                    <td>Date</td>
+                    <td>{{ date }}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
     </div>
     
 </main>

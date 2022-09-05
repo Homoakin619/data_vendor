@@ -10,7 +10,7 @@
               <p>Username : {{ request.user.username }}</p>
               <p>Phone : {{ customer.phone }}</p>
               <p>Ref Id : {{ customer.ref_id }}</p>
-              <p>Pin: {{ customer.pin }} <a class="btn" data-bs-toggle="modal" data-bs-target="#pinModal" role="button" >SetPin</a> </p>
+              <p>Pin:  <a class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#pinModal" role="button"><b>SetPin</b></a> </p>
               <a href="{% url 'edit-profile' %}" class="btn btn-success">Edit</a>
           </div>
       </div>

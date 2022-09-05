@@ -1,3 +1,4 @@
+from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.forms import ValidationError
@@ -143,6 +144,7 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                         return render(self.request,self.template_name,context)
                     else:
                         try:
+                            print(beneficiary)
                         ##### api call
                         # check network and data quantity to pass to api call
                             url = f"https://megabyte.com.ng/api/v2/datashare/?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
@@ -158,7 +160,8 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                                         successful=True,price=price
                                     )
                                 transaction.save()
-                                return HttpResponseRedirect(reverse('success'))
+                                transaction_context = {'item':merchant,'item_qty':item_qty,'date':date.today(),'transaction_id':transaction_id,'beneficiary':beneficiary}
+                                return render(self.request,'core/success.html',context=transaction_context)
                             elif code == 1983:
                                 #  Send admin message that he has insufficient balance on his wallet
                                 subject = 'Insufficient balance'
