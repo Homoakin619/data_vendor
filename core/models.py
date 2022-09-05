@@ -7,7 +7,7 @@ import string
 import json
 
 airtel = {'1GB':'airtel_1gb_30days','2GB':'airtel_2gb_30days','3GB':'airtel_3gb_30days'}
-mtn = {'1GB':'mtn_1gb_30days','2GB':'mtn_2gb_30days','3GB':'mtn_3gb_30days'}
+mtn = {'1GB':'data_share_1gb','2GB':'data_share_2gb','3GB':'data_share_3gb'}
 
 def get_product_name(name,qty):
 	

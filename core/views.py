@@ -130,7 +130,7 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                 api_key = settings.DATA_API_KEY
                 user_pin = customer.pin
                 recharge_self = self.request.POST.get('self_recharge',False)
-                print("--",product_name)
+                
                 if int(pin) == user_pin:
                     if recharge_self is not False:
                         beneficiary = customer.phone
@@ -150,7 +150,6 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                             headers = {}
                             response = requests.request("POST",url, headers=headers, data=payload)
                             code = int(response.json()['error_code'])
-                            print(type(code))
                             if code == 1986:
                                 transaction_id = response.json()['data']['recharge_id']
                                 price = get_price(merchant,item_qty)
@@ -175,7 +174,6 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                                 messages.success(self.request,"Oops! Transaction Failed! \n Please try again. \nNOTE: You were not charged for this transaction")
                                 return render(self.request,self.template_name,context)
                             else:
-                                
                                 return HttpResponseRedirect(reverse('dashboard'))
                         except:
                             pass
