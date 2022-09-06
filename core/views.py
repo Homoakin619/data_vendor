@@ -146,11 +146,12 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                         try:
                         ##### api call
                         # check network and data quantity to pass to api call
-                            url = f"https://megabyte.com.ng/api/v2/datashare/?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
+                            url = f"{settings.API_ENDPOINT}?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
                             payload = ""
                             headers = {}
                             response = requests.request("POST",url, headers=headers, data=payload)
                             code = int(response.json()['error_code'])
+                            
                             if code == 1986:
                                 transaction_id = response.json()['data']['recharge_id']
                                 price = get_price(merchant,item_qty)
@@ -180,8 +181,10 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                                 return render(self.request,self.template_name,context)
                             else:
                                 return HttpResponseRedirect(reverse('dashboard'))
-                        except:
-                            pass
+                        except Exception as e:
+                            print("error")
+                            print(e)
+                            return self.get(*args,**kwargs)
                 else: 
                     context['error'] = True
                     form.add_error('pin',ValidationError('Pin is incorrect'))

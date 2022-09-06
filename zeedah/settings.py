@@ -36,9 +36,10 @@ LOGIN_URL = 'login_page'
 LOGIN_REDIRECT_URL = 'dashboard'
 
 DATA_API_KEY=env('DATA_API_KEY')
+API_ENDPOINT = env('API_ENDPOINT')
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
