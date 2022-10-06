@@ -213,7 +213,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filters': ['require_debug_false'],
+            # 'filters': ['require_debug_false'],
             'filename': 'mysite.log',
             'formatter': 'verbose'
         },
