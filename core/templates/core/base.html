@@ -19,6 +19,13 @@
               width: 220px;
             }
           }
+          
+          .whatsapp {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+          }
+
         </style>
         {% block style %} 
 
@@ -134,9 +141,9 @@
                   <span class="me-0">Visit your profile to create transaction pin if you haven't</span>
                   <li class="list-inline-item px-sm-0 m-0">
                     <a class="nav-link">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#currency"/></svg>
-                      <span class=" ms-1 d-sm-inline">{{ request.user|get_balance }} </span></a>
-                  </li> 
+                    <svg class="bi me-2" style="display: inline-block;" width="25" height="25"><use xlink:href="#currency"/></svg>
+                      {{ request.user|get_balance }}</a>
+                  </li>  
                   <li class="list-inline-item px-sm-0 m-0">
                     |
                   </li>
@@ -152,6 +159,9 @@
               {% endblock %}
             </div>
         </div>  
+      </div>
+      <div class="whatsapp">
+        <svg class="bi me-2" style="color:darkgreen" width="120" height="120"><use xlink:href="#currency"/></svg>
       </div>
     </body>
     

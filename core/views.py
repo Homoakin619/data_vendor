@@ -1,4 +1,5 @@
 from datetime import date
+from email import message
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.forms import ValidationError
@@ -118,7 +119,7 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
         form = PinPurchaseForm(self.request.POST)
         user = self.request.user
         customer = get_object_or_404(Customer,user=user)
-        context = {'items':Merchant.objects.all(),'form':form,'error':False}
+        context = {'items': Merchant.objects.all(), 'form': form, 'error': False}
 
         if self.request.POST.get('form-name') == 'pin-form':
             if form.is_valid():
@@ -146,41 +147,45 @@ class DashboardView(LoginRequiredMixin,CheckVerificationMixin,generic.View):
                         try:
                         ##### api call
                         # check network and data quantity to pass to api call
-                            url = f"{settings.API_ENDPOINT}?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
-                            payload = ""
-                            headers = {}
-                            response = requests.request("POST",url, headers=headers, data=payload)
-                            code = int(response.json()['error_code'])
-                            
-                            if code == 1986:
-                                transaction_id = response.json()['data']['recharge_id']
-                                price = get_price(merchant,item_qty)
-                                balance = customer.balance - price
-                                customer.balance = balance
-                                customer.save()
-                                transaction =Transaction.objects.create(
-                                        transaction_id=transaction_id, user=user, merchant=merchant, beneficiary=beneficiary, item_qty=item_qty, 
-                                        successful=True,price=price
-                                    )
-                                transaction.save()
-                                transaction_context = {'item':merchant,'item_qty':item_qty,'date':date.today(),'transaction_id':transaction_id,'beneficiary':beneficiary}
-                                return render(self.request,'core/success.html',context=transaction_context)
-                            elif code == 1983:
-                                #  Send admin message that he has insufficient balance on his wallet
-                                subject = 'Insufficient balance'
-                                body = 'Hi Admin \nBalance is low recharge'
-                                sender = 'zeedah@gmail.com'
-                                email = 'kolakins97@gmail.com'
-                                with mail.get_connection() as connection:
-                                    mail.EmailMessage(
-                                        subject, body, sender, [email],
-                                        connection=connection,
-                                    ).send()
+                            if customer.balance > amount:
+                                url = f"{settings.API_ENDPOINT}?api_key={api_key}&product_code={product_name}&phone=0{beneficiary}"
+                                payload = ""
+                                headers = {}
+                                response = requests.request("POST",url, headers=headers, data=payload)
+                                code = int(response.json()['error_code'])
                                 
-                                messages.success(self.request,"Oops! Transaction Failed! \n Please try again. \nNOTE: You were not charged for this transaction")
-                                return render(self.request,self.template_name,context)
+                                if code == 1986:
+                                    transaction_id = response.json()['data']['recharge_id']
+                                    price = get_price(merchant,item_qty)
+                                    balance = customer.balance - price
+                                    customer.balance = balance
+                                    customer.save()
+                                    transaction =Transaction.objects.create(
+                                            transaction_id=transaction_id, user=user, merchant=merchant, beneficiary=beneficiary, item_qty=item_qty, 
+                                            successful=True,price=price
+                                        )
+                                    transaction.save()
+                                    transaction_context = {'item':merchant,'item_qty':item_qty,'date':date.today(),'transaction_id':transaction_id,'beneficiary':beneficiary}
+                                    return render(self.request,'core/success.html',context=transaction_context)
+                                elif code == 1983:
+                                    #  Send admin message that he has insufficient balance on his wallet
+                                    subject = 'Insufficient balance'
+                                    body = 'Hi Admin \nBalance is low recharge'
+                                    sender = 'zeedah@gmail.com'
+                                    email = 'kolakins97@gmail.com'
+                                    with mail.get_connection() as connection:
+                                        mail.EmailMessage(
+                                            subject, body, sender, [email],
+                                            connection=connection,
+                                        ).send()
+                                    
+                                    messages.success(self.request,"Oops! Transaction Failed! \n Please try again. \nNOTE: You were not charged for this transaction")
+                                    return render(self.request,self.template_name,context)
+                                else:
+                                    return HttpResponseRedirect(reverse('dashboard'))
                             else:
-                                return HttpResponseRedirect(reverse('dashboard'))
+                                messages.warning(self.request,"Oops! You do not have enough funds to carry out this transaction \n Fund your wallet to continue")
+                                return self.get(*args,**kwargs)
                         except Exception as e:
                             print("error")
                             print(e)
