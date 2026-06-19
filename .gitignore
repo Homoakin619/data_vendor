@@ -5,6 +5,7 @@ mysite.log
 *.md
 mails
 *.txt
+.gitignore
+branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
-.gitignore
